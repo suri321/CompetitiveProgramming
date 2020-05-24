@@ -6,10 +6,10 @@ void dfs(int cur, int prev)
 { 
     depth[cur] = depth[prev] + 1; 
     parent[cur][0] = prev; 
-    for (int i=0; i<adj[cur-1].size(); i++) 
+    for (int i=0; i<adj[cur].size(); i++) 
     { 
-        if (adj[cur-1][i]+1 != prev) 
-            dfs(adj[cur-1][i]+1, cur); 
+        if (adj[cur][i] != prev) 
+            dfs(adj[cur][i], cur); 
     } 
 } 
   
@@ -48,7 +48,25 @@ int LCA(int u, int v)
   
     return parent[u][0]; 
 }
+
+int kthancestor(int V, int k) 
+{ 
+    // Doing bitwise operation to 
+    // check the set bit 
+    for (int i = 0; i <= level; i++) 
+    { 
+        if (k & (1 << i)) 
+        { 
+            V = parent[V][i]; 
+            if (V == -1) 
+                break; 
+        } 
+    } 
+    return V; 
+} 
  
  
 dfs(1,0); 
 precomputeSparseMatrix(n);
+LCA(u,v);
+kthancestor(node,k);
