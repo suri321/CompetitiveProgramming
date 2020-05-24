@@ -22,7 +22,7 @@ using namespace std;
 vector<pair<int,int> > trees[N];
 
 // Update function for different type of queries, sum, min, max, xor-sum, ..  
-int fun(int a,int b){
+ll fun(ll a,ll b){
 	return max(a,b);
 //	return a+b;
 }
@@ -42,19 +42,19 @@ struct treeNode
 /* every Edge has a weight and two ends. We store deeper end */
 struct Edge 
 { 
-	int weight; // Weight of Edge 
+	ll weight; // Weight of Edge 
 	int deeper_end; // Deeper end 
 } edge[N]; 
 
 /* we construct one segment tree, on base array */
 struct segmentTree 
 { 
-	int base_array[N], tree[6*N]; 
+	ll base_array[N], tree[6*N]; 
 } s; 
 
 // A function to add Edges to the Tree matrix 
 // e is Edge ID, u and v are the two nodes, w is weight 
-void addEdge(int e, int u, int v, int w) 
+void addEdge(int e, int u, int v, ll w) 
 { 
 	/*tree as undirected graph*/
 	trees[u-1].pb(mp(v-1,e-1));
@@ -126,7 +126,7 @@ void hld(int curr_node, int id, int *edge_counted, int *curr_chain, int n, int c
 
 // A recursive function that constructs Segment Tree for array[ss..se). 
 // si is index of current node in segment tree st 
-int construct_ST(int ss, int se, int si) 
+ll construct_ST(int ss, int se, int si) 
 { 
 	// If there is one element in array, store it in current node of 
 	// segment tree and return 
@@ -147,7 +147,7 @@ int construct_ST(int ss, int se, int si)
 // x is the node to be updated to value val 
 // si is the starting index of the segment tree 
 // ss, se mark the corners of the range represented by si 
-int update_ST(int ss, int se, int si, int x, int val) 
+ll update_ST(int ss, int se, int si, int x, ll val) 
 { 
 
 	if(ss > x || se <= x); 
@@ -164,7 +164,7 @@ int update_ST(int ss, int se, int si, int x, int val)
 } 
 
 // A function to update Edge e's value to val in segment tree 
-void change(int e, int val, int n) 
+void change(int e, ll val, int n) 
 { 
 	update_ST(0, n, 1, node[edge[e].deeper_end].pos_segbase, val); 
 
@@ -234,7 +234,7 @@ int LCA(int u, int v)
 	ss & se --> Starting and ending indexes of the segment represented 
 				by current node, i.e., st[index] 
 	qs & qe --> Starting and ending indexes of query range */
-int RMQUtil(int ss, int se, int qs, int qe, int index) 
+ll RQUtil(int ss, int se, int qs, int qe, int index) 
 { 
 	//printf("%d,%d,%d,%d,%d\n", ss, se, qs, qe, index); 
 
@@ -249,30 +249,30 @@ int RMQUtil(int ss, int se, int qs, int qe, int index)
 
 	// If a part of this segment overlaps with the given range 
 	int mid = (ss + se)/2; 
-	return fun(RMQUtil(ss, mid, qs, qe, 2*index), 
-			RMQUtil(mid, se, qs, qe, 2*index+1)); 
+	return fun(RQUtil(ss, mid, qs, qe, 2*index), 
+			RQUtil(mid, se, qs, qe, 2*index+1)); 
 } 
 
 // Return minimum of elements in range from index qs (query start) to 
 // qe (query end). It mainly uses RMQUtil() 
-int RMQ(int qs, int qe, int n) 
+ll RQ(int qs, int qe, int n) 
 { 
 	// Check for erroneous input values 
 	if (qs < 0 || qe > n-1 || qs > qe) 
-	{ 
-		printf("Invalid Input"); 
+	{  
 		return -1; 
 	} 
 
-	return RMQUtil(0, n, qs, qe, 1); 
+	return RQUtil(0, n, qs, qe, 1); 
 } 
 
 // A function to move from u to v keeping track of the maximum 
 // we move to the surface changing u and chains 
 // until u and v donot belong to the same 
-int crawl_tree(int u, int v, int n, int chain_heads[]) 
+ll crawl_tree(int u, int v, int n, int chain_heads[]) 
 { 
-	int chain_u, chain_v = node[v].chain, ans = 0; 
+	int chain_u, chain_v = node[v].chain;
+	ll ans = 0; 
 
 	while (true) 
 	{ 
@@ -286,7 +286,7 @@ int crawl_tree(int u, int v, int n, int chain_heads[])
 		{ 
 			if (u==v); //trivial
 			else
-			ans = fun(RMQ(node[v].pos_segbase+1, node[u].pos_segbase, n), ans); 
+			ans = fun(RQ(node[v].pos_segbase+1, node[u].pos_segbase, n), ans); 
 			break; 
 		} 
 
@@ -295,7 +295,7 @@ int crawl_tree(int u, int v, int n, int chain_heads[])
 		to which u belongs indicating change of chain */
 		else
 		{ 
-			ans = fun(ans, RMQ(node[chain_heads[chain_u]].pos_segbase, node[u].pos_segbase, n)); 
+			ans = fun(ans, RQ(node[chain_heads[chain_u]].pos_segbase, node[u].pos_segbase, n)); 
 			u = node[chain_heads[chain_u]].par; 
 		} 
 	} 
@@ -304,11 +304,11 @@ int crawl_tree(int u, int v, int n, int chain_heads[])
 } 
 
 // A function for MAX_EDGE query 
-int Fquery(int u, int v, int n, int chain_heads[]) 
+ll Fquery(int u, int v, int n, int chain_heads[]) 
 { 
 	int lca = LCA(u+1, v+1); 
 	lca--;
-	int ans = fun(crawl_tree(u, lca, n, chain_heads), crawl_tree(v, lca, n, chain_heads)); 
+	ll ans = fun(crawl_tree(u, lca, n, chain_heads), crawl_tree(v, lca, n, chain_heads)); 
 	return ans;
 } 
 
@@ -347,11 +347,12 @@ void test(){
       	if(qtype==1){
       		int u,v;
 	      	cin>>u>>v;
-	      	int ans = Fquery(u-1,v-1,n,chain_heads);
+	      	ll ans = Fquery(u-1,v-1,n,chain_heads);
 	      	cout<<ans<<"\n";
 		}
       	else{   // query type 2 change value of edge number e to val
-      		int e,val;
+      		int e;
+			ll val;
 	      	cin>>e>>val;
 	      	change(e-1, val, n);	
 		}	 
